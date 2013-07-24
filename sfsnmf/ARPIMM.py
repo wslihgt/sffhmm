@@ -142,13 +142,13 @@ def normalize(A, axis=None):
     return A / Asum
 
 def SFSNMF(SX,
-           W, WR, stepNotes,
+           W, WR, 
            G0=None,
            H0=None,
            nbIterations=200,
            scopeMedian=10,
-           dispEvol=True, verbose=True,
-           poleFrq=None, poleAmp=None, smoothIt=True):
+           dispEvol=True, verbose=True, smoothIt=True,
+           poleFrq=None, poleAmp=None, stepNotes=None,):
     """SFSNMF
     source/filter sparse non-negative matrix factorization
     
@@ -163,7 +163,7 @@ def SFSNMF(SX,
     In the following, we assume that the number of frequency bins is F, the
     number of frames is N. There are P elements for the Source/Filter model,
     that is 1 source and P-1 formants. 
-
+    
     INPUTS
     ------
      SX F x N ndarray
@@ -171,47 +171,62 @@ def SFSNMF(SX,
      
      W list of P spectral dictionaries
       For each p in [0, P-1]:
-      W[p] is a F x K[p] ndarray of spectral dictionary for the source
-      component (p=0) and for the formants (p>0). 
-
+      W[p] is a F x K[p] ndarray of spectral dictionary for the source
+      component (p=0) and for the formants (p>0).
+      
      WR F x KR ndarray
       spectral dictionary, consisting of KR smooth elements, used to
       define the recording condition filter. 
-
-     stepNotes int
       
-
      G0 list of P ndarray
+      initial list of amplitude coefficients
+      G0[p] is a K[p] x N ndarray of the amplitude coefficients for the
+      p^th formant (and the source for p=0).
       
-
      H0 N ndarray
       initial vector for the energy component of the model
-
-     nbIterations
-
-     scopeMedian
-
+      
+     nbIterations int
+      number of iterations for the iterative algorithm
+      
+     scopeMedian int
+      the scope of the median filter: the \"integration\" window is then of
+      size `2 * scopeMedian + 1`
+      
      dispEvol
-
-     verbose
-
+      Displays the evolution of the matrices during the estimation.
+      Requires matplotlib
+      
+     verbose bool
+      Prints more feedback to the console
+      
+     smoothIt bool
+      Triggers the smoothing scheme for sparsity control (via median filtering)
+     
      poleFrq
+      NOT USED FOR THE TIME BEING
 
-     poleAmp
+     poleAmp 
+      NOT USED FOR THE TIME BEING
 
-     smoothIt
+     stepNotes 
+      NOT USED FOR THE TIME BEING
 
     OUTPUTS
     -------
      G
-      List of estimated amplitude matrices 
+      List of P estimated amplitude matrices,
+      G[p] is a K[p] x N ndarray
 
-     GR
-      Amplitude matrix for the recording 
+     GR KR ndarray
+      Amplitude vector for the recording.
 
-     H
+     H N ndarray
+      Energy coefficient vector. 
 
-     recoError
+     recoError 
+      vector containing the reconstruction errors, as defined as the
+      Itakura Saito divergence between SX and the estimated power spectrum.
     
     REFERENCE
     ---------

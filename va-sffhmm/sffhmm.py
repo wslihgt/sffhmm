@@ -32,7 +32,8 @@ based on the Matlab code at:
 http://mlg.eng.cam.ac.uk/zoubin/software/fhmm.tar.gz
 and with a few lines coming from scikits.learn.hmm (v 0.11)
 
-Note:
+Note
+----
 
  The forward/backward procedure in C is used in scipy.weave.inline.
  This is mostly a bad idea. It works so far, but weave is discontinued.
@@ -61,15 +62,6 @@ from scipy.optimize import nnls
 from scipy.signal import lfilter
 
 import warnings
-# scikits.learn v0.8
-##warnings.warn("This script builds on top of scikits.learn.hmm"+\
-##              " and was developed under version 0.8 of it.")
-##
-##from scikits.learn.hmm import _BaseHMM, GaussianHMM
-##from scikits.learn.mixture import (logsum,
-##                                   _distribute_covar_matrix_to_match_cvtype,
-##                                   _validate_covars)
-##from scikits.learn.base import BaseEstimator
 
 # from scikits.learn (sklearn) v0.9:
 import sklearn
@@ -90,6 +82,7 @@ else:
     from sklearn.utils.extmath import logsumexp as logsum
 
 # home brew forward backward, with inline:
+"TODO: use proper import of C functions, like Cython or SWIG"
 from scipy.weave import inline
 fwdbwd_filename = 'computeLogDensity_FB_Viterbi.c'
 fwdbwd_file = open(fwdbwd_filename,'r')
@@ -164,7 +157,58 @@ class _BaseFHMM(BaseEstimator): # TODO: should it be subclass of _BaseHMM?
                  startprob_prior=None,
                  transmat_prior=None,
                  HMM=None):
-        """
+        """Base class for the Factorial HMM isntances
+        
+        It is an sklearn BaseEstimator subclass. However, 
+
+        INPUTS
+        ------
+         n_states : list
+          a list of integers: n_states[p] is the number of states for the p^th
+          independent HMM chain.
+          
+         startprob : None or list
+          list of ndarray (vector) starting probabilities for each of the
+          states and for each HMM chain
+          
+         transmat : None or list
+          list of ndarray (matrix) for the transition probabilities, for each
+          HMM chain, between the different states of the given chain. 
+         
+         startprob_prior : None or list
+          list of startprob priors, see the 
+
+         transmat_prior : None or list
+          
+         
+         HMM :
+         
+         
+        Remarks
+        -------
+         2013-07-23:
+         Implements the decode_var method. In line with the sklearn module,
+         the `decode` method aims at decoding the sequence, that is to
+         provide the sequence of most likely states given a (HMM) model and
+         the observation matrix.
+         The provided `decode_var` method actually corresponds to the
+         variational approximation of the decoding.
+
+         It is an sklearn BaseEstimator subclass. However, it does not
+         completely comply with the sklearn directives yet. We had to use
+         a `decode_var` method instead of the `decode` method, in order
+         to pass it arguments. It would seem that this distinction is not
+         necessary anymore, and one should work to make this compliant with
+         more recent sklearn directives.
+         
+         TODO: Actually, the FHMM is also an HMM, and allowing it to subclass
+         the _BaseHMM class would be good, for instance to be able to compute
+         exact inference whenever possible (few states). The transition matrix
+         can be infered at this level, but for other parameters (for instance
+         mean and covariance parameters for GaussianHMM) need to be addressed
+         in subclasses, depending on the chosen underlying observation
+         likelihood.
+
         """
         
         self._n_states = list(n_states)
