@@ -1414,17 +1414,25 @@ class SFFHMM(GaussianFHMM):
             ##self.formantRanges[5] = [4500.0, self.maxFinFT]
             # from durrieu/thiran ICASSP 2011 article:
             # schafer + hill (union), 20101019
-            self.formantRanges = {}
-            self.formantRanges[0] = [200.0, 1000.0]
-            self.formantRanges[1] = [550.0, 3100.0]
-            self.formantRanges[2] = [1700.0, 3800.0]
-            self.formantRanges[3] = [2400.0, 6000.0]
-            self.formantRanges[4] = [4500.0, np.minimum(8000.0, self.maxFinFT)]
-            if self.maxFinFT>9000:
-                self.formantRanges[5] = [ 6500., 15000.]
-                self.formantRanges[6] = [ 8000., 20000.]
-                self.formantRanges[7] = [15000., 22000.]
-                
+            #self.formantRanges = {}
+            #self.formantRanges[0] = [200.0, 1000.0]
+            #self.formantRanges[1] = [550.0, 3100.0]
+            #self.formantRanges[2] = [1700.0, 3800.0]
+            #self.formantRanges[3] = [2400.0, 6000.0]
+            #self.formantRanges[4] = [4500.0, np.minimum(8000.0, self.maxFinFT)]
+            #1if self.maxFinFT>9000:
+            #    self.formantRanges[5] = [ 6500., 15000.]
+            #    self.formantRanges[6] = [ 8000., 20000.]
+            #    self.formantRanges[7] = [15000., 22000.]
+            # From TASLP 2013 article:
+            formantsRange = {}
+            formantsRange[0] = [ 200.0, 1500.0] # check hillenbrand data
+            formantsRange[1] = [ 550.0, 3500.0]
+            formantsRange[2] = [1400.0, 4500.0]
+            formantsRange[3] = [2400.0, 6000.0] # adding one for full band
+            formantsRange[4] = [3300.0, 8000.0]
+            formantsRange[5] = [4500.0, 8000.0]
+            formantsRange[6] = [5500.0, 8000.0]
         else:
             self.formantRanges = {}
             for n in range(len(formantRanges)):

@@ -13,7 +13,8 @@ as described in:
 
 Usage
 -----
-    
+...
+
 2013 - Jean-Louis Durrieu (http://www.durrieu.ch/research/)
 
 """
@@ -448,6 +449,8 @@ htmlFile.close()
 #erAbsMatFrq = struc['erAbsMatFrq'].tolist()
 #struc.close()
 
+# COMPUTING RESULTS AND FIGURES # 
+
 fontsize = 12
 
 nbins = 100
@@ -679,14 +682,6 @@ plt.draw()
 plt.savefig(savefilename[:-3]+'pdf')
 
 ### images for TASLP 2013 article
-# making the pictures:
-##FHzmax = 4000.0
-##nFmax = np.int32(np.ceil(FHzmax/fs*NFT))
-##ytickslab = np.array([1000, 2000, 3000, 4000])
-##ytickspos = np.int32(np.ceil(ytickslab/fs*NFT))
-##fontsize = 16
-##figheight=4.5
-##figwidth=9.0
 
 plt.rc('lines', linewidth=4)
 Fs = sffhmm.samplingRate * 1.
