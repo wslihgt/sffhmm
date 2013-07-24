@@ -14,7 +14,8 @@ import scipy.io.wavfile as wav
 from tracking import viterbiTrackingArray
 
 sys.path.append('../tools')
-from imageTools import imageM, subplotMatrix, plotRegions, plotRegionsX, plotRegionsY
+from imageTools import imageM, subplotMatrix, plotRegions
+from imageTools import plotRegionsX, plotRegionsY
 
 import readSVLfiles
 from matplotlib.mlab import find as mlabFind
@@ -24,11 +25,6 @@ from SFSNMF_functions import *
 # Running the tests of above functions:
 
 displayEvolution = True
-class Options(object):
-    def __init__(self, verbose=True):
-        self.verbose = verbose
-
-options = Options()
 
 import matplotlib.pyplot as plt
 from imageMatlab import imageM
@@ -37,17 +33,17 @@ from imageMatlab import imageM
 plt.rc('image',cmap='jet')
 plt.ion()
 
-windowSizeInSamples = 2048 #np.round(options.windowSize * fs)
-hopsize = 256 #np.round(options.hopsize * fs)
-NFT = 2048 #options.fourierSize
-niter = 50 #options.nbiter
+windowSizeInSamples = 2048
+hopsize = 256
+NFT = 2048
+niter = 50
 
 # TODO: also process these as options:
 minF0 = 80
 maxF0 = 500
 Fs = 44100.0
 maxFinFT = 8000.0
-F = np.ceil(maxFinFT * NFT / np.double(Fs)) # limiting the computations to 16kHz sampled signals
+F = np.ceil(maxFinFT * NFT / np.double(Fs)) 
 
 stepNotes = 16 # this is the number of F0s within one semitone
 K = 10 # number of spectral shapes for the filter part
@@ -62,10 +58,10 @@ chirpPerF0 = 1
 # Create the harmonic combs, for each F0 between minF0 and maxF0:
 
 F0Table, WF0 = \
-         generate_WF0_chirped(minF0, maxF0, Fs, Nfft=NFT, \
-                              stepNotes=stepNotes, \
-                              lengthWindow=windowSizeInSamples, Ot=0.9, \
-                              perF0=chirpPerF0, \
+         generate_WF0_chirped(minF0, maxF0, Fs, Nfft=NFT, 
+                              stepNotes=stepNotes, 
+                              lengthWindow=windowSizeInSamples, Ot=0.9, 
+                              perF0=chirpPerF0, 
                               depthChirpInSemiTone=.15,
                               loadWF0=True,
                               analysisWindow='hanning')
@@ -82,7 +78,8 @@ if withExtraUnvoiced:
 
 
 
-bwRange, freqRanges, poleAmp, poleFrq, WGAMMA = genARbasis(F, NFT, Fs, maxF0=2*maxF0, formantsRange=formantsRange)
+bwRange, freqRanges, poleAmp, poleFrq, WGAMMA = genARbasis(
+    F, NFT, Fs, maxF0=2*maxF0, formantsRange=formantsRange)
 numberOfFormants = freqRanges.shape[0]
 numberOfAmpPerFormantFreq = bwRange.size
 
@@ -150,11 +147,12 @@ if False:
                     np.outer(np.ones(K[p]), sigma))
         plt.figure()
         plt.plot(H[p][:,frameNo], label=u'$\mathbf{h}_n^p$')
-        plt.plot([muH[frameNo], muH[frameNo]],[0, H[p][:,frameNo].max()],\
+        plt.plot([muH[frameNo], muH[frameNo]],[0, H[p][:,frameNo].max()],
                  color='r', label=u'$\mu_{pn}$')
-        plt.plot(Hp[:,frameNo]*H[p][:,frameNo].max(), color='g', ls='--', \
+        plt.plot(Hp[:,frameNo]*H[p][:,frameNo].max(), color='g', ls='--', 
                  label=u'Weight')
-        plt.plot(Hp[:,frameNo]*H[p][:,frameNo], color='g', label=u'Reweighed $\mathbf{h}_n^p$')
+        plt.plot(Hp[:,frameNo]*H[p][:,frameNo], color='g',
+                 label=u'Reweighed $\mathbf{h}_n^p$')
         plt.legend(prop={'size': fontsize})
         plt.xticks(fontsize=fontsize)
         plt.yticks(fontsize=fontsize)
@@ -167,8 +165,8 @@ if False:
         p = 0
         sigma = 1000
         eps = 1e-50
-        muH = np.dot(np.arange(K[p]-1) * \
-                     (np.arange(K[p]-1, 0, -1))**2, \
+        muH = np.dot(np.arange(K[p]-1) * 
+                     (np.arange(K[p]-1, 0, -1))**2, 
                      H[p][:-1,:]) / \
                      np.dot((np.arange(K[p]-1, 0, -1))**2,
                             np.maximum(H[p][:-1,:], eps))

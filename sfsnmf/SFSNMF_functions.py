@@ -26,6 +26,7 @@ http://www.durrieu.ch/research/
 
 import numpy as np
 import os
+import warnings
 
 def nextpow2(i):
     """
@@ -538,6 +539,63 @@ def genARfunction(numberFrequencyBins, sizeOfFourier, Fs, \
                   numberOfAmpsPerPole=5, \
                   numberOfFreqPerPole=60, \
                   maxF0 = 1000.0):
+    """Generates the AR frequency responses for the desired
+    pole amplitude and frequency ranges.
+    
+    INPUT
+    -----
+     numberFrequencyBins
+      the number of frequency bins to be kept, i.e. the size of the frequency
+      domain vectors/frequency response vectors.
+      
+     sizeOfFourier
+      the size of the Fourier transform
+      
+     Fs
+      the sampling rate
+      
+     formantsRange
+      a list of two frequency values: the lower and upper bound for a given
+      formant
+      
+     bwRange
+      a list of two bandwidth values, the lower and upper bound for a given
+      formant. If None is given, then the `maxF0` argument is used as the
+      minimum allowed bandwidth (otherwise, the generated spectral shapes could
+      be misinterpreted as spectral peaks due to voiced sources), while the
+      widest bandwidth is set to 10% of the sampling rate.
+      
+     numberOfAmpsPerPole
+      the number of amplitudes to generate within the desired range.
+      
+     numberOfFreqPerPole
+      the number of pole frequencies to generate from the provided range.
+      
+     maxF0
+      the maximum F0 frequency, for the source/filter model.
+
+
+    OUTPUT
+    ------
+     bwRange
+      ndarray of all the bandwidth values
+      
+     freqRanges
+      ndarray of all the frequency values
+      
+     poleAmp
+      the actual values of the amplitudes for each pole
+     
+     poleFrq
+      the frequency values of the pole
+     
+     WGAMMA
+      F x K ndarray
+      The dictionary matrix containing the spectral frequency responses.
+      Each column is a frequency response for a given formant/complex pole:
+      
+    
+    """
     if formantsRange is None:
         formantsRange = [80.0, 1400.0]
     
@@ -579,20 +637,26 @@ def genARfunction(numberFrequencyBins, sizeOfFourier, Fs, \
     
     return bwRange, freqRanges, poleAmp, poleFrq, WGAMMA
 
-def genARbasis(numberFrequencyBins, sizeOfFourier, Fs, \
-               formantsRange=None, \
-               bwRange=None, \
-               numberOfAmpsPerPole=5, \
-               numberOfFreqPerPole=60, \
+def genARbasis(numberFrequencyBins, sizeOfFourier, Fs, 
+               formantsRange=None, 
+               bwRange=None, 
+               numberOfAmpsPerPole=5, 
+               numberOfFreqPerPole=60,
                maxF0 = 1000.0):
     if formantsRange is None:
         formantsRange = {}
-        formantsRange[0] = [80.0, 1400.0]
-        formantsRange[1] = [200.0, 3000.0]
-        formantsRange[2] = [300.0, 4000.0]
-        formantsRange[3] = [1100.0, 6000.0]
-        formantsRange[4] = [4500.0, 15000.0]
-        formantsRange[5] = [9000.0, 20000.0]
+        formantsRange[0] = [ 200.0, 1500.0] # check hillenbrand data
+        formantsRange[1] = [ 550.0, 3500.0]
+        formantsRange[2] = [1400.0, 4500.0]
+        formantsRange[3] = [2400.0, 6000.0] # adding one for full band
+        formantsRange[4] = [3300.0, 8000.0]
+        formantsRange[5] = [4500.0, 8000.0]
+        formantsRange[6] = [5500.0, 8000.0]
+        if Fs != 16000:
+            warnings.warn('The sampling rate is not 16kHz, but %d.\n' %Fs +
+                          'Please check that the provided formantRange is ' +
+                          'suitable for that particular sampling rate:\n' +
+                          str(formantRange))
     
     numberOfFormants = len(formantsRange)
     

@@ -1,13 +1,41 @@
 #!/usr/bin/python
 
+"""Running an example of SFSNMF for a file from the Hillenbrand dataset
+
+Description
+-----------
+This script runs the SFSNMF algorithm on an audio file from the Hillenbrand
+dataset. The Source/Filter Sparse NMF algorithm is described in
+
+ Durrieu, J.-L. and Thiran, J.-P.
+ \"Source/Filter Factorial Hidden Markov Model,
+ with Application to Pitch and Formant Tracking\"
+ IEEE Transactions on Audio, Speech and Language Processing,
+ Submitted Jan. 2013, Accepted July 2013.
+
+Usage
+-----
+
+ 1) modify the `loadHillenbrand.py` script such that
+    the directories fit those of your system (especially where the program
+    can find the Hillenbrand directory)
+ 2) run the script (preferably within an `ipython` console, for interactivity
+    and to be able to play with the figures once the computation is done.).
+    Some outputs will be displayed on the console output, in particular the
+    progress of the computation as well as the reconstruction errors.
+    Some figures are also displayed, showing the evolution of the various
+    quantities during the estimation.
+
+2013 - Jean-Louis Durrieu (http://www.durrieu.ch/research/)
+
+"""
+
 import numpy as np
 import os.path
 import time
 import ARPIMM
 
 import scipy.linalg as spla
-
-# import scikits.audiolab as al
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -30,8 +58,7 @@ from loadHillenbrand import *
 filenb = 330 # for bigdat
 filenbt = mpl.mlab.find(timedatnames==bigdatnames[filenb])[0]
 
-fs, data = loadHill(bigdatnames[filenb])
-Fs=fs
+fs, data = loadHill(bigdatnames[filenb]) 
 
 windowSizeInSeconds = 0.064
 
@@ -54,9 +81,9 @@ SX = SX[:F,:]
 
 # draw figure plus formant annotated
 FHzmax = 4000.0
-nFmax = np.int32(np.ceil(FHzmax/Fs*NFT))
+nFmax = np.int32(np.ceil(FHzmax/fs*NFT))
 ytickslab = np.array([1000, 2000, 3000, 4000])
-ytickspos = np.int32(np.ceil(ytickslab/Fs*NFT))
+ytickspos = np.int32(np.ceil(ytickslab/fs*NFT))
 fontsize = 16
 figheight=4.5
 figwidth=9.0
@@ -91,7 +118,7 @@ formantsRange[6] = [5500.0, 8000.0]
 
 # generate the autoregressive spectral dictionary:
 bwRange, freqRanges, poleAmp, poleFrq, WGAMMA = genARbasis(
-    F, NFT, Fs, maxF0=2*maxF0, formantsRange=formantsRange)
+    F, NFT, fs, maxF0=2*maxF0, formantsRange=formantsRange)
 numberOfFormants = freqRanges.shape[0]
 numberOfAmpPerFormantFreq = bwRange.size
 
@@ -102,7 +129,7 @@ nbElPerF = Nwgamma/numberOfFormants
 
 # generate the spectral combs for the source:
 F0Table, WF0 = \
-         generate_WF0_chirped(minF0, maxF0, Fs, Nfft=NFT, \
+         generate_WF0_chirped(minF0, maxF0, fs, Nfft=NFT, \
                               stepNotes=stepNotes, \
                               lengthWindow=windowSizeInSamples, Ot=0.5, \
                               perF0=chirpPerF0, \
@@ -132,14 +159,14 @@ for p in range(numberOfFormants):
     # the corresponding W...
 
 WR = generateHannBasis(numberFrequencyBins=F,
-                       sizeOfFourier=NFT, Fs=Fs,
+                       sizeOfFourier=NFT, Fs=fs,
                        frequencyScale='linear',
                        numberOfBasis=20, 
                        overlap=.75)
 
 P = len(W)
 
-# SFSNMF algorithm:
+# SFSNMF algorithm to estimate the parameters for the given signal:
 niter = 80
 G, GR, H, recoError2 = ARPIMM.SFSNMF(SX, W, WR, poleFrq=None, H0=None, \
                                      stepNotes=None, nbIterations=niter,
@@ -193,9 +220,9 @@ plt.draw()
 if False:
     # making the pictures:
     FHzmax = 4000.0
-    nFmax = np.int32(np.ceil(FHzmax/Fs*NFT))
+    nFmax = np.int32(np.ceil(FHzmax/fs*NFT))
     ytickslab = np.array([1000, 2000, 3000, 4000])
-    ytickspos = np.int32(np.ceil(ytickslab/Fs*NFT))
+    ytickspos = np.int32(np.ceil(ytickslab/fs*NFT))
     fontsize = 16
     figheight=4.5
     figwidth=9.0

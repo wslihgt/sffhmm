@@ -1,24 +1,11 @@
-"""sffhmm_hill_batch
-
-This is the script is part of the files for the article:
-    J.-L. Durrieu and J.-Ph. Thiran,
-    'Source/Filter Factorial Hidden Markov Model,
-    with Application to Pitch and Formant Tracking,'
-    submitted, 2012.
+"""loadHillenbrand.py
 
 Loads some pieces of information about the files from the
 Hillenbrand dataset, available online at the address:
     http://homepages.wmich.edu/~hillenbr/voweldata.html
 
+2013 Jean-Louis Durrieu, LTS5, EPFL
 
-
-Dependencies:
-    * numpy, scipy (for wav file I/O)
-    * matplotlib (for displaying figures)
-    * sffhmm.py: as provided with our article
-    * scikits.learn: v. 0.8, 0.9 or 0.10. lower or higher versions
-      may lead to problems with the `hmm` module. 
-    * 
 """
 
 import numpy as np
@@ -26,6 +13,18 @@ import scipy as sp
 import scipy.io.wavfile as wav
 import os.path
 
+#########
+# PATHS #
+#########
+"""
+Modify these paths and filenames in order to fit those of your system.
+
+In particular, one have to set the `timedataf` and `bigdataf` variables,
+which contain the filename and complete path to, resp., the `timedata.dat`
+and `bigdata.dat` files.
+
+The path the the root of the database has to be given in `prefixBDD`.
+"""
 if os.path.isdir('/Users/jeanlouis/work/BDD/'):
     timedataf = '/Users/jeanlouis/work/BDD/hillenbrand/vowels/timedata.dat'
     bigdataf = '/Users/jeanlouis/work/BDD/hillenbrand/vowels/bigdata.dat'
@@ -37,6 +36,11 @@ elif os.path.isdir('/home/durrieu/work/BDD/'):
 else:
     raise ImportError('Jean-Louis, you are working somewhere unusual...')
 
+###########
+# PARSING #
+###########
+
+# parsing the metadata files:
 timedat = np.loadtxt(timedataf, skiprows=6, usecols=(1,2,3,4))
 timedatnames = np.loadtxt(timedataf, skiprows=6, usecols=(0,),
                           dtype=np.str)
@@ -69,7 +73,14 @@ for n in range(3):
     meansFormants[n] = bigdat[:,rangeInBigDat].mean()
     stdFormants[n] = bigdat[:,rangeInBigDat].std()
 
+#############
+# Functions #
+#############
+
 def loadHill(filename, folder=prefixBDD):
+    """Loads an audio wavfile, guessing the correct complete path
+    from the filename and the provided root folder. 
+    """
     if filename[0] == 'm':
         subpath = '/men/'
     elif filename[0] == 'w':
@@ -81,8 +92,12 @@ def loadHill(filename, folder=prefixBDD):
     return wav.read(filenameFull)
 
 def displayHistograms(bins=100):
+    """draws a histogram, giving the distribution of formant values within
+    the Hillenbrand dataset.
+    """
     import matplotlib.pyplot as plt
     plt.figure()
     for n in range(3):
         plt.hist(bigdat[:, 5+n+np.arange(8)*3].flatten(),
                  histtype='step', bins=bins)
+
