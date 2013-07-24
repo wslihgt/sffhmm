@@ -176,7 +176,7 @@ if not(os.path.isdir(dirSaveArx)):
     os.mkdir(dirSaveArx)
 
 fileSaveParam = str('').join([dirSaveArx,
-                              '/commonParameters.npz'])+
+                              '/commonParameters.npz'])
 
 kwParams = {
     'Ot':Ot, 'W':W, 'F0Table':F0Table, 'WGAMMA':WGAMMA,
