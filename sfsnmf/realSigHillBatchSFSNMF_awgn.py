@@ -301,6 +301,9 @@ for filenb in range(nbFilesHill):
         eps = 10**-50
         if displayStatic:
             Shat = [np.dot(W[0], G[0])]
+
+        # EXTRACT THE ESTIMATED SEQUENCES OF FORMANTS
+        # from the estimated matrices output by the SFSNMF algorithm
         mu = {}
         mu[0] = np.dot(np.arange(NF0-1) * \
                        (np.arange(NF0-1, 0, -1))**2, \
@@ -316,7 +319,8 @@ for filenb in range(nbFilesHill):
                                   np.maximum(G[p][:-1,:], eps))
             if displayStatic:
                 Shat.append(np.dot(W[p],G[p]))
-            
+                
+        # The F0 frequency sequence, in Hz:
         F0seq = F0Table[np.int32(mu[0])]
         
         compTimes[snrnb + filenb*len(snrs)] = time.time() - time0
@@ -334,7 +338,8 @@ for filenb in range(nbFilesHill):
                          np.double(fs)*NFT,
                          'ok', markerfacecolor='w', markeredgewidth=4)
             plt.plot(F0seq/np.double(fs)*NFT, ls='--', lw=1)
-            
+
+        # The Formant frequencies, in Hz
         Fformant = {}
         for p in range(1,P):
             Fformant[p-1] = poleFrq[np.int32((p-1)*nbElPerF+mu[p])]
@@ -346,12 +351,16 @@ for filenb in range(nbFilesHill):
                                     '/', bigdatnames[filenb],
                                     '.npz'])
         
+        # state formant frequencies in Mel:
         statesInMel = np.zeros([numberOfFormants, H.size])
         for p in range(1, numberOfFormants+1):
             nbElPerF = G[p].shape[0]-1 
             statesInMel[p-1] = poleFrqMel[\
                 np.int32((p-1)*nbElPerF+mu[p])]
-            
+
+        ###############################
+        # COMPUTING THE ERROR METRICS #
+        ###############################
         for t in range(8):
             for n in range(numberGTFormants):
                 errorMatrix[snr][n,:,8*filenb+t] = \
