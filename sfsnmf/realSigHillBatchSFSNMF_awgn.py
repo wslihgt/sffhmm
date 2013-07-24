@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 """Experiments for the SFSNMF algorithm
+
 Description
 -----------
 Runs the experiments for the SFSNMF algorithm, for various SNR cconditions,
@@ -68,7 +69,9 @@ chirpPerF0 = 1
 #########################################################################
 from loadHillenbrand import *
 
+##############
 # PARAMETERS #
+##############
 fs=16000.0
 
 windowSizeInSeconds = 0.064 # 0.032
@@ -203,7 +206,7 @@ for snr in snrs:
     erFilMatrix[snr] = np.ones([numberGTFormants,
                                 numberOfFormants,
                                 nbFilesHill])
-
+    
     errorMatrix[snr] = np.ones([numberGTFormants,
                                 numberOfFormants,
                                 8*nbFilesHill])
@@ -283,7 +286,7 @@ for filenb in range(nbFilesHill):
             plt.imshow(db(SX))
             clmt = plt.figure(3).get_axes()[0].get_images()[0].get_clim()
             plt.hold(True)
-
+            
         # THE GROUND TRUTH FORMANTS
         # as annotated in Hhillenbrand's files
         trueFormant = {}
@@ -301,7 +304,7 @@ for filenb in range(nbFilesHill):
         eps = 10**-50
         if displayStatic:
             Shat = [np.dot(W[0], G[0])]
-
+            
         # EXTRACT THE ESTIMATED SEQUENCES OF FORMANTS
         # from the estimated matrices output by the SFSNMF algorithm
         mu = {}
@@ -338,7 +341,7 @@ for filenb in range(nbFilesHill):
                          np.double(fs)*NFT,
                          'ok', markerfacecolor='w', markeredgewidth=4)
             plt.plot(F0seq/np.double(fs)*NFT, ls='--', lw=1)
-
+            
         # The Formant frequencies, in Hz
         Fformant = {}
         for p in range(1,P):
@@ -357,7 +360,7 @@ for filenb in range(nbFilesHill):
             nbElPerF = G[p].shape[0]-1 
             statesInMel[p-1] = poleFrqMel[\
                 np.int32((p-1)*nbElPerF+mu[p])]
-
+            
         ###############################
         # COMPUTING THE ERROR METRICS #
         ###############################
@@ -406,6 +409,7 @@ if False:
     plt.xlabel('Frequency (Hz)', fontsize=fontsize)
     plt.legend((['F0 = %dHz' %(F0Table[nbF0])]))
     plt.subplots_adjust(top=.96, right=0.96, left=.06, bottom=.13)
+    # plt.savefig('w0.pdf')
     
     ##plt.rc('text', usetex=False)
     plt.figure(figsize=[figwidth, figheight])
@@ -427,3 +431,4 @@ if False:
     plt.xlabel('Frequency (Hz)', fontsize=fontsize)
     plt.axis('tight')
     plt.subplots_adjust(top=.96, right=0.96, left=.06, bottom=.13)
+    # not the image from the article, see SFFHMM instead.

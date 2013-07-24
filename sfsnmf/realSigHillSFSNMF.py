@@ -49,7 +49,7 @@ displayEvolution = True
 import matplotlib.pyplot as plt
 
 ## plt.rc('text', usetex=True)
-plt.rc('image',cmap='jet')
+plt.rc('image', cmap='jet', origin='lower')
 plt.ion()
 
 # get the data from hillenbrand
@@ -117,8 +117,12 @@ formantsRange[5] = [4500.0, 8000.0]
 formantsRange[6] = [5500.0, 8000.0]
 
 # generate the autoregressive spectral dictionary:
+numberOfAmpsPerPole = 10
+numberOfFreqPerPole = 40
 bwRange, freqRanges, poleAmp, poleFrq, WGAMMA = genARbasis(
-    F, NFT, fs, maxF0=2*maxF0, formantsRange=formantsRange)
+    F, NFT, fs, maxF0=maxF0, formantsRange=formantsRange,
+    numberOfAmpsPerPole=numberOfAmpsPerPole,
+    numberOfFreqPerPole=numberOfFreqPerPole)
 numberOfFormants = freqRanges.shape[0]
 numberOfAmpPerFormantFreq = bwRange.size
 

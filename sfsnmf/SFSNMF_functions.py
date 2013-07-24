@@ -1,9 +1,4 @@
-
-"""
-ARPIMM module: Auto-Regressive (p) Instantaneous Mixture Model
---------------------------------------------------------------
-
-Support functions and main estimation algorithm for the ARPIMM model,
+"""Support functions and main estimation algorithm for the ARPIMM model,
 also called the Source/Filter Sparse Non-Negative Matrix Factorization
 (SFSNMF), as published in the following articles:
 
@@ -643,6 +638,79 @@ def genARbasis(numberFrequencyBins, sizeOfFourier, Fs,
                numberOfAmpsPerPole=5, 
                numberOfFreqPerPole=60,
                maxF0 = 1000.0):
+    """Generates the AR frequency responses for the desired
+    pole amplitude and frequency ranges.
+    
+    INPUT
+    -----
+     numberFrequencyBins
+      the number of frequency bins to be kept, i.e. the size of the frequency
+      domain vectors/frequency response vectors.
+      
+     sizeOfFourier
+      the size of the Fourier transform
+      
+     Fs
+      the sampling rate
+      
+     formantsRange
+      a dictionary of the formant ranges for each of the formants.
+      Each entry is therefore a list of two frequency values:
+      the lower and upper bound for the given formant. For example, by default:
+
+       >>> formantsRange = {}
+       >>> formantsRange[0] = [ 200.0, 1500.0] # check hillenbrand data
+       >>> formantsRange[1] = [ 550.0, 3500.0]
+       >>> formantsRange[2] = [1400.0, 4500.0]
+       >>> formantsRange[3] = [2400.0, 6000.0] # adding one for full band
+       >>> formantsRange[4] = [3300.0, 8000.0]
+       >>> formantsRange[5] = [4500.0, 8000.0]
+       >>> formantsRange[6] = [5500.0, 8000.0]
+      
+     bwRange
+      a list of two bandwidth values, the lower and upper bound for a given
+      formant. If None is given, then the `maxF0` argument is used as the
+      minimum allowed bandwidth (otherwise, the generated spectral shapes could
+      be misinterpreted as spectral peaks due to voiced sources), while the
+      widest bandwidth is set to 10% of the sampling rate.
+      
+     numberOfAmpsPerPole
+      the number of amplitudes to generate within the desired range.
+      
+     numberOfFreqPerPole
+      the number of pole frequencies to generate from the provided range.
+      
+     maxF0
+      the maximum F0 frequency, for the source/filter model.
+
+
+    OUTPUT
+    ------
+     bwRange
+      ndarray of all the bandwidth values
+      
+     freqRanges
+      ndarray of all the frequency values
+      
+     poleAmp
+      the actual values of the amplitudes for each pole
+     
+     poleFrq
+      the frequency values of the pole
+     
+     WGAMMA
+      F x K ndarray
+      The dictionary matrix containing the spectral frequency responses.
+      Each column is a frequency response for a given formant/complex pole. 
+      For the n^th formant, the w^th frequency freqRanges[n][w] and a^th
+      amplitude (corresponding to bandwidth bwRange[a]), the corresponding
+      vector in WGAMMA is:
+      
+        WGAMMA[:, n * numberOfAmpsPerPole * numberOfFreqPerPole + 
+                  w * numberOfAmpsPerPole + 
+                  a]
+    
+    """
     if formantsRange is None:
         formantsRange = {}
         formantsRange[0] = [ 200.0, 1500.0] # check hillenbrand data
@@ -708,9 +776,13 @@ def genARbasis(numberFrequencyBins, sizeOfFourier, Fs,
     return bwRange, freqRanges, poleAmp, poleFrq, WGAMMA
 
 def mel2hz(f):
+    """Converts a frequency in Mel into Hz
+    """
     return 700.0 * (10**(f / 2595.0) - 1)
 
 def hz2mel(f):
+    """Converts a frequency in Hz into Mel
+    """
     return 2595 * np.log10(1+f/700.0)
 
 def generate_ODGD_vec(F0vec, Fs, lengthOdgd=2048,
@@ -718,6 +790,11 @@ def generate_ODGD_vec(F0vec, Fs, lengthOdgd=2048,
                       t0=0.0, analysisWindowType='hanning',
                       noiseLevel=1.):
     """generate_ODGD_vec
+    
+    generates a glottal source signal corresponding to the F0 sequence provided
+    in `F0vec`. `lengthOdgd` is the length of data signal during which the
+    F0 is constant. 
+    
     """
     N = F0vec.size
     odgd = np.zeros([N*lengthOdgd])
