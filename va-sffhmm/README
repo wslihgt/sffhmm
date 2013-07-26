@@ -6,7 +6,7 @@ This archive contains the python software for the article
 Jean-Louis Durrieu and Jean-Philippe Thiran,
 "Source/Filter Factorial Hidden Markov Model, 
 with Application to Pitch and Formant Tracking", 
-submitted in 2013.
+submitted in Jan. 2013, accepted July 2013.
 
 INSTALL:
 --------
@@ -39,11 +39,16 @@ In details, it contains the following files:
       C code for the forward/backward procedure 
   * loadHillenbrand.py
       a script that loads a few variables specific to the Hillenbrand dataset
+  * LPCanalysis.py
+      functions related with linear predictive coding (LPC) analysis,
+      for use to initialize the posterior probability matrices.
   * sffhmm.py 
       python module that extends scikits.learn and implements
       the main functions for the parameter estimation of the SFFHMM
       model.
   * sffhmm_hill_batch_awgn.py
       script to launch a batch processing for the whole Hillenbrand dataset.
+  * sffhmm_vtr_batch_resPerVow.py
+      script to launch a batch processing for Deng's dataset.
   * test_sffhmm.py
       An example of how one can use the SFFHMM for a given file.
